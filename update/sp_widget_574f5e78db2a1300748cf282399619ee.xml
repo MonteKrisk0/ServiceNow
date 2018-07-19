@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>standard</category>
+        <client_script><![CDATA[function controller($scope, $rootScope, spUtil, spModal) {
+	var c = this;	
+	
+	$scope.images = c.data.images;
+	
+	$rootScope.$on('articleSelected', function(event, data){
+		c.data.articleId = data;
+		spUtil.update($scope).then(function() {
+			$scope.images = c.data.images;
+		});
+	});
+	
+	$scope.previewPhoto = function(photo) {
+		spModal.open({
+			widget: 'zs-article-photos',
+			widgetInput: {
+				imageId: photo.sys_id
+			},
+			scope: $scope
+		});
+	};
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.images_inline {&#13;
+    list-style:none;&#13;
+    display:inline-block;&#13;
+}&#13;
+&#13;
+ul{&#13;
+    padding:0;&#13;
+    margin:0;&#13;
+    white-space:nowrap;&#13;
+}&#13;
+&#13;
+.white {&#13;
+  background-color: #ffffff;&#13;
+}&#13;
+&#13;
+.thumbnail {&#13;
+    height:100px;&#13;
+    padding:2px;&#13;
+}&#13;
+&#13;
+.thumbswrapper {&#13;
+    overflow-x: scroll;&#13;
+    height:20%;&#13;
+    margin:20px auto;&#13;
+}&#13;
+&#13;
+.thumbwrapper {&#13;
+    height:20%;&#13;
+}&#13;
+</css>
+        <data_table>sp_instance_carousel</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list>interval</field_list>
+        <has_preview>false</has_preview>
+        <id>zs-newsfeed-carousel</id>
+        <internal>false</internal>
+        <link/>
+        <name>Zs Newsfeed Carousel</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function(){
+	
+	data.images = [];
+	
+	
+	var articleId = data.articleId;
+	if(input) {
+		articleId = input.articleId;
+	}
+	var images = new GlideRecord('u_zs_article_images');
+	images.addQuery('u_article', articleId);
+	images.query();
+		
+	while(images.next()) {
+		var imgData = {};
+		
+		$sp.getRecordElements(imgData, images, 'u_name,u_image,sys_id');
+		data.images.push(imgData);
+	}
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-06-05 00:33:25</sys_created_on>
+        <sys_id>574f5e78db2a1300748cf282399619ee</sys_id>
+        <sys_mod_count>43</sys_mod_count>
+        <sys_name>Zs Newsfeed Carousel</sys_name>
+        <sys_package display_value="Demo Portal" source="x_116151_demo_port">c0f767f5db121300748cf2823996191c</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Demo Portal">c0f767f5db121300748cf2823996191c</sys_scope>
+        <sys_update_name>sp_widget_574f5e78db2a1300748cf282399619ee</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-06-07 00:06:45</sys_updated_on>
+        <template><![CDATA[<div ng-if="images.length > 0">
+  <div class="row">
+    <div class="thumbswrapper">
+      <ul>
+        <li ng-repeat="image in images" class="images_inline">
+          <div class="thumbwrapper">
+            <a ng-click="previewPhoto(image)">
+              <img class="thumbnail" ng-src="{{image.u_image.display_value}}" />
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, $rootScope, spUtil) {
+  /* widget controller */
+    var c = this;
+	var imageId = c.data.imageId; console.log(imageId);
+	$scope.image = c.data.image || {};
+	
+	var comms = JSON.parse(c.data.image.u_comments_list);
+	$scope.comments = comms == '[]' ? [] : comms;
+	c.tempComment = '';
+	
+	$scope.isCommenterAuthor = function(commenter) {
+		return !c.data.isAuthor && c.data.articleAuthor == commenter;
+	};
+	
+	$scope.getCommentClass = function(commenter) {
+		return $scope.isCommenterAuthor(commenter) ? 'article_author' : '';
+	};
+	
+	$scope.submitComment = function() {
+		c.data.newComment = c.tempComment + '';
+		c.data.imageId = imageId;
+		
+		c.tempComment = '';
+		c.server.update().then(function(){
+			var comms = JSON.parse(c.data.image.u_comments_list);
+			$scope.comments = comms == '[]' ? [] : comms;
+		});
+	};
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.article_author {&#13;
+ color: #ffa500; &#13;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>zs-article-photos</id>
+        <internal>false</internal>
+        <link/>
+        <name>zs Article Photos</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	var imgRecId = data.imageId;
+	if(input) {
+		imgRecId = input.imageId;
+	}
+	if(input.newComment) {
+		
+		var comm = new GlideRecord('u_zs_article_images');
+		comm.get(imgRecId.display_value + '');
+		
+		comm.setValue('u_comments', input.newComment);
+		
+		comm.update();
+	}
+	
+	var imgRecData = {};
+	var gr = new GlideRecord('u_zs_article_images');
+	gr.get(imgRecId.display_value);
+	
+	var author = new GlideRecord('sys_user');
+	author.get('user_name', gr.u_article.sys_created_by);
+	data.isAuthor = author.getDisplayValue() == gs.getUser().getDisplayName();
+	
+	$sp.getRecordElements(imgRecData, gr, 'u_name,u_image,u_comments_list,sys_id');
+	imgRecData.u_comments_list = gr.u_comments_list + '';
+	data.image = imgRecData;
+	data.imageId = imgRecId;
+	data.currUser = gs.getUser().getDisplayName();
+	data.articleAuthor = author.getDisplayValue();
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-06-05 23:04:00</sys_created_on>
+        <sys_id>c8621f89dba25300748cf2823996190f</sys_id>
+        <sys_mod_count>98</sys_mod_count>
+        <sys_name>zs Article Photos</sys_name>
+        <sys_package display_value="Demo Portal" source="x_116151_demo_port">c0f767f5db121300748cf2823996191c</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Demo Portal">c0f767f5db121300748cf2823996191c</sys_scope>
+        <sys_update_name>sp_widget_c8621f89dba25300748cf2823996190f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-06-07 01:31:58</sys_updated_on>
+        <template><![CDATA[<div ng-if="image" class="well">
+  <div class="row">
+    <div class="col-sm-6">
+      <img class="img-thumbnail img-responsive" ng-src="{{image.u_image.display_value}}" />
+    </div>
+    <div class="col-sm-6">
+      <div class="row">
+        <div class="col-sm-12">
+          <h3 class="text-center">
+            {{image.u_name.display_value}} - Comment Section
+          </h3>
+          <div ng-show="comments.length > 0" ng-repeat="comment in comments | orderBy : created" class="media">
+            <div class="media-left">
+              <img src="https://www.cybersmile.org/wp-content/plugins/cybersmile-forum//style/default-avatar.png" class="media-object" style="width:30px">
+            </div>
+            <div class="media-body">
+              <h5 class="media-heading" ng-class="getCommentClass(comment.author)">
+                <span ng-show="isCommenterAuthor(comment.author)">*author*</span>{{comment.author}}{{c.data.currUser == comment.author ? '(me)' : ''}}:
+              </h5>
+              <blockquote>
+                {{comment.content}}
+              </blockquote>
+              <footer class="text-right">
+                {{comment.created}}
+              </footer>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <form submit="$event.preventDefault()" class="align-bottom">
+          <div class="form-group">
+            <label class=".lead">
+              {{comments.length > 0 ? 'Write a comment' : 'Be the first one to write a comment!'}}
+            </label>
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Type here.." ng-model="c.tempComment" />
+              <div class="input-group-btn">
+                <button type="submit" ng-click="submitComment()" class="btn btn-default">
+                  <i class="glyphicon glyphicon-comment"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </footer>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

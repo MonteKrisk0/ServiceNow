@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, spUtil) {
+  /* widget controller */
+  var c = this;
+	
+	spUtil.recordWatch($scope, 'u_zs_newsfeed', '', function(name) {
+		spUtil.update($scope);
+	});
+	
+	var articleTempl = {
+		title: 'No records to display',
+		content: '',
+		published: '',
+		author: ''
+	}
+	
+	$scope.currentArticle = c.data.news[0] || articleTempl;
+	$scope.previewArticle = function(article) {
+		$scope.currentArticle = {
+			title: article.title,
+			content: article.content,
+			published: article.published,
+			author: article.author
+		}
+	}
+	
+	$scope.articleClass = function(article) {
+		var defaultClass = 'list-group-item';
+		if($scope.currentArticle.published == article.published) {
+			defaultClass += ' active';
+		}
+		return defaultClass;
+	}
+	
+	$scope.filterArticles = function(search) {
+		if(!search) {
+			return;
+		}
+		
+		return function(article) {
+			var titleContains = article.title.toLowerCase().indexOf(search.toLowerCase()) > -1,
+					contentContains = article.content.toLowerCase().indexOf(search.toLowerCase()) > -1,
+					publishedContains = article.published.toLowerCase().indexOf(search.toLowerCase()) > -1,
+					authorContains = article.author.toLowerCase().indexOf(search.toLowerCase()) > -1;
+			
+			return authorContains || titleContains || contentContains || publishedContains;
+		}
+	}
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.scrollable {
+ height: 400px;
+ overflow-y: scroll; 
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>newsfeed</id>
+        <internal>false</internal>
+        <link/>
+        <name>Newsfeed</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	
+	var limit = options.limit,
+		newsPrefix = options.news_prefix;
+	
+	var newsfeed = new GlideRecord('u_zs_newsfeed');
+	newsfeed.orderByDesc('sys_created_on');
+	if(limit) {
+		newsfeed.setLimit(limit);
+	}
+	if(newsPrefix) {
+		newsfeed.addQuery('u_title', 'STARTSWITH', newsPrefix);
+	}
+	newsfeed.query();
+	
+	data.news = [];
+	
+	while(newsfeed.next()) {
+		
+		var author = new GlideRecord('sys_user');
+		author.get('user_name', newsfeed.sys_created_by + '');
+		
+		var article = {
+			title: newsfeed.u_title + '',
+			content: newsfeed.u_content + '',
+			published: newsfeed.sys_created_on + '',
+			author: author.getDisplayValue()
+		};
+		
+		data.news.push(article);
+	}
+	
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-27 23:26:50</sys_created_on>
+        <sys_id>8a53055adbda1300748cf282399619f2</sys_id>
+        <sys_mod_count>76</sys_mod_count>
+        <sys_name>Newsfeed</sys_name>
+        <sys_package display_value="Demo Portal" source="x_116151_demo_port">c0f767f5db121300748cf2823996191c</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Demo Portal">c0f767f5db121300748cf2823996191c</sys_scope>
+        <sys_update_name>sp_widget_8a53055adbda1300748cf282399619f2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-05-29 06:49:10</sys_updated_on>
+        <template><![CDATA[<div class = "well">
+  <h1 class="text-center">
+    Newsfeed
+  </h1>
+  <div class="row">
+    <form>
+      <div class="input-group">
+        <input ng-model="searchText" type="text" class="form-control" placeholder="Search..">
+        <div class="input-group-btn">
+          <span class="btn btn-default">
+            <i class="glyphicon glyphicon-search"></i>
+          </span>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="row"></div>
+  <div class="row">
+    <div class="col-sm-9">
+      <div class="scrollable">
+        <h2 class="text-center">
+          {{currentArticle.title}}
+        </h2>
+        <blockquote>
+          {{currentArticle.content}}
+        </blockquote>
+        <footer class="text-right">
+          {{currentArticle.author}} - {{currentArticle.published}}
+        </footer>
+      </div>
+    </div>
+    <div class="col-sm-3 panel panel-default scrollable">
+  	 <h3 class="text-center">
+       Articles ({{c.data.news.length}})
+      </h3>
+     <ul ng-repeat="article in c.data.news | filter:filterArticles(searchText) | orderBy : '-published'" class="list-group">
+       <li ng-click="previewArticle(article)" ng-class="articleClass(article)">
+         {{article.title}}
+       </li>
+      </ul>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+</record_update>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, spUtil, spModal, $rootScope) {
+    /* widget controller */
+    var c = this;
+	
+	
+	$scope.article = c.data.article;
+	
+	$rootScope.$on('articleSelected', function(event, data) {
+		c.data.articleId = data;
+		spUtil.update($scope).then(function() {
+			$scope.article = c.data.article;
+		});
+	});
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.scrollable {&#13;
+ height: 400px;&#13;
+ overflow-y: scroll; &#13;
+}&#13;
+&#13;
+.white {&#13;
+  background-color: #ffffff;&#13;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>zs-preview-article</id>
+        <internal>false</internal>
+        <link/>
+        <name>Ziross News Current Article</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+  /* populate the 'data' object */
+  /* e.g., data.table = $sp.getValue('table'); */
+	var articleId = data.articleId;
+	
+	data.photosWidget = $sp.getWidget('zs-newsfeed-carousel');
+	
+	if(input) {
+		articleId = input.articleId;
+	}
+	
+	
+	var article = new GlideRecord('u_zs_newsfeed');
+	if(article.get(articleId)) {
+		var author = new GlideRecord('sys_user');
+		author.get('user_name', article.sys_created_by + '');
+		
+		data.article = {
+			displayValue: article.u_title + '',
+			content: article.u_content + '',
+			published: article.sys_created_on + '',
+			author: author.getDisplayValue(),
+			id: article.sys_id + ''
+		};
+	} else {
+		data.article = {
+			displayValue: 'No records to display',
+			content: '',
+			published: '',
+			author: '',
+			id: ''
+		};
+	}
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-06-05 01:38:43</sys_created_on>
+        <sys_id>804e2234db6a1300748cf28239961992</sys_id>
+        <sys_mod_count>20</sys_mod_count>
+        <sys_name>Ziross News Current Article</sys_name>
+        <sys_package display_value="Demo Portal" source="x_116151_demo_port">c0f767f5db121300748cf2823996191c</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Demo Portal">c0f767f5db121300748cf2823996191c</sys_scope>
+        <sys_update_name>sp_widget_804e2234db6a1300748cf28239961992</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-06-05 21:55:08</sys_updated_on>
+        <template><![CDATA[<div class="well white scrollable">
+  <div class="row">
+    <zs-news-article article="article"></zs-news-article>
+  </div>
+  <div class="row">
+    <sp-widget widget="c.data.photosWidget" />
+  </div>
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

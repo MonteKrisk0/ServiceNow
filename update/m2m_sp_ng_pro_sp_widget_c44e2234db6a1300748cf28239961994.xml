@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="m2m_sp_ng_pro_sp_widget">
+    <m2m_sp_ng_pro_sp_widget action="INSERT_OR_UPDATE">
+        <sp_angular_provider display_value="zsNewsArticle">37766b6adb9a5300748cf282399619b9</sp_angular_provider>
+        <sp_widget display_value="Ziross News Current Article">804e2234db6a1300748cf28239961992</sp_widget>
+        <sys_class_name>m2m_sp_ng_pro_sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-06-05 01:38:43</sys_created_on>
+        <sys_id>c44e2234db6a1300748cf28239961994</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>zsNewsArticle.Copy of NewsfeedL2</sys_name>
+        <sys_package display_value="Demo Portal" source="x_116151_demo_port">c0f767f5db121300748cf2823996191c</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Demo Portal">c0f767f5db121300748cf2823996191c</sys_scope>
+        <sys_update_name>m2m_sp_ng_pro_sp_widget_c44e2234db6a1300748cf28239961994</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-06-05 01:38:43</sys_updated_on>
+    </m2m_sp_ng_pro_sp_widget>
+</record_update>
